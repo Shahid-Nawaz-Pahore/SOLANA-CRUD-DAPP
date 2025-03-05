@@ -15,7 +15,12 @@ pub mod CRUD {
       journal_entry.message = message;
       Ok(())
     }
-  
+ fn update_journal_entry(ctx: Context<UpdateEntry>, _title: String, message:String) ->Result<()> {
+      let journal_entry  = &mut ctx.accounts.journal_entry;
+      journal_entry.message = message;
+      Ok(())
+    }
+
 
 }
 
@@ -34,6 +39,23 @@ pub struct CreateEntry<'info> {
   pub owner: AccountInfo<'info>,
   pub system_program: Program<'info, System>,
 }
+
+#[derive(Accounts)]
+#[instruction(title: String)]
+pub struct UpdateEntry<'info> {
+  #[account(
+    mut,
+    seeds = [title.as_bytes(), owner.key().as_ref()],
+    bump,
+    realloc::payer = owner,
+    realloc::zero = true,
+  )]
+  pub journal_entry: Account<'info, JournalEntryState>,
+  #[account(mut)]
+  pub owner: AccountInfo<'info>,
+  pub system_program: Program<'info, System>,
+}
+
 
 #[account]
 #[derive(InitSpace)]
