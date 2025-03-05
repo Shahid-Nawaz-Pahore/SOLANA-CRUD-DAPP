@@ -21,6 +21,9 @@ pub mod CRUD {
       Ok(())
     }
 
+    fn delete_journal_entry(ctx: Context<DeleteEntry>, _title:String) ->Result<()> {
+      Ok(())
+    }
 
 }
 
@@ -49,6 +52,22 @@ pub struct UpdateEntry<'info> {
     bump,
     realloc::payer = owner,
     realloc::zero = true,
+  )]
+  pub journal_entry: Account<'info, JournalEntryState>,
+  #[account(mut)]
+  pub owner: AccountInfo<'info>,
+  pub system_program: Program<'info, System>,
+}
+
+
+#[derive(Accounts)]
+#[instruction(title: String)]
+pub struct DeleteEntry<'info> {
+  #[account(
+    mut,
+    seeds = [title.as_bytes(), owner.key().as_ref()],
+    bump,
+    close = owner,
   )]
   pub journal_entry: Account<'info, JournalEntryState>,
   #[account(mut)]
